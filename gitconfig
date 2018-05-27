@@ -2,11 +2,11 @@
   editor = nvim
 
 [user]
-  name = Nebojša Stričević
-  email = nebojsa.stricevic@gmail.com
+  name = Tanja Stjepanović Stričević
+  email = stricevictanja@gmail.com
 
 [github]
-  user = strika
+  user = tanjass
 
 [color]
   ui = auto
