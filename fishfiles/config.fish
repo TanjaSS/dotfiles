@@ -4,7 +4,6 @@ fish_add_path ~/.local/bin
 
 # Plugins
 fundle plugin "edc/bass"
-fundle plugin "FabioAntunes/fish-nvm"
 fundle plugin "pure-fish/pure"
 
 fundle init
