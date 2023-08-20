@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+
+here="$(dirname "$0")"
+here="$(cd "$here"; pwd)"
+
+mkdir -p ${XDG_CONFIG_HOME:=$HOME/.config}
+
+install_basic_packages() {
+  echo "Download package lists"
+  sudo apt update -q -y 2>&1 >/dev/null
+
+  echo "Install basic tools"
+  sudo apt install -y curl git make ack-grep exuberant-ctags tree \
+    build-essential libssl-dev libreadline-dev zlib1g-dev htop ncdu \
+    fish kitty httpie neovim
+    2>&1 >/dev/null
+}
+
+install_local_bin() {
+  mkdir -p "${HOME}/.local/bin"
+
+  for file in "${here}/bin"/*; do
+    name="$(basename "$file")"
+    ln -sfv "$file" "${HOME}/.local/bin/${name}"
+  done
+}
+
+link_dotfiles() {
+  echo "Link dotfiles"
+
+  dotfiles=(gitconfig gitattributes rdebugrc rspec)
+
+  for file in "${dotfiles[@]}"; do
+    dotname=".${file}"
+    ln -sfv "${here}/${file}" "${HOME}/${dotname}"
+  done
+}
+
+setup_kitty() {
+  kitty_config_dir="${HOME}/.config/kitty"
+
+  echo "Install kittyfiles"
+
+  mkdir -p "$kitty_config_dir"
+
+  for file in "${here}/kittyfiles"/*; do
+    name="$(basename "$file")"
+    ln -sfv "$file" "${kitty_config_dir}/${name}"
+  done
+}
+
+setup_fish() {
+  fish_config_dir="${HOME}/.config/fish"
+
+  echo "Install fishfiles"
+
+  mkdir -p "$fish_config_dir"
+
+  for file in "${here}/fishfiles"/*; do
+    name="$(basename "$file")"
+    ln -sfv "$file" "${HOME}/.config/fish/${name}"
+  done
+
+  fish_update_completions
+}
+
+install_fzf() {
+  fzf_directory="${HOME}/.fzf"
+
+  if [[ ! -d $fzf_directory ]]; then
+    echo "Install FZF"
+    git clone --depth 1 https://github.com/junegunn/fzf.git "$fzf_directory"
+    cd "$fzf_directory" && ./install --all --no-bash --no-zsh
+  fi
+}
+
+do_all() {
+  install_basic_packages
+  install_local_bin
+  link_dotfiles
+  setup_kitty
+  setup_fish
+  install_fzf
+}
+
+do_all
+
+echo 'Change your shell with chsh -s $(which fish)'
